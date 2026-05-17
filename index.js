@@ -1,0 +1,55 @@
+// dns server for mongodb connection
+const dns = require("node:dns");
+dns.setServers(["1.1.1.1", "8.8.8.8"]); // Cloudflare + Google DNS
+
+require('dotenv').config()
+
+const express = require('express')
+const cors = require('cors')
+const app = express()
+const port = process.env.PORT || 5000
+
+const { MongoClient, ServerApiVersion } = require('mongodb');
+const uri = process.env.MONGODB_URI
+
+app.use(cors())
+app.use(express.json())
+
+const client = new MongoClient(uri, {
+    serverApi: {
+        version: ServerApiVersion.v1,
+        strict: true,
+        deprecationErrors: true,
+    }
+});
+
+async function run() {
+    try {
+        // todo: comment it when deploying to production
+        await client.connect();
+
+        const db = client.db('mediqueue-db')
+        const tutorCollection = db.collection("tutors")
+
+        app.get('/tutors', async (req, res) => {
+            const result = await tutorCollection.find().toArray()
+            res.json(result)
+        });
+
+        // todo: comment it when deploying to production
+        await client.db("admin").command({ ping: 1 });
+        console.log("Pinged your deployment. You successfully connected to MongoDB!");
+    } finally {
+
+        // await client.close();
+    }
+}
+run().catch(console.dir);
+
+app.get('/', (req, res) => {
+    res.send('Hello World! Sabbir')
+})
+
+app.listen(port, () => {
+    console.log(`Listening on port ${port}`)
+})
