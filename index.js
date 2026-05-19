@@ -9,7 +9,7 @@ const cors = require('cors')
 const app = express()
 const port = process.env.PORT || 5000
 
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const uri = process.env.MONGODB_URI
 
 app.use(cors())
@@ -33,6 +33,12 @@ async function run() {
 
         app.get('/tutors', async (req, res) => {
             const result = await tutorCollection.find().toArray()
+            res.json(result)
+        });
+
+        app.get('/tutors/:id', async (req, res) => {
+            const id = await req.params.id
+            const result = await tutorCollection.findOne({ _id: new ObjectId(id) })
             res.json(result)
         });
 
