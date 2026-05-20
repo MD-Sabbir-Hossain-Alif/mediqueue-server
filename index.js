@@ -42,6 +42,14 @@ async function run() {
             res.json(result)
         });
 
+        app.post('/tutors', async (req, res) => {
+            const tutor = req.body
+            const result = await tutorCollection.insertOne(tutor)
+            res.json(result)
+        });
+
+
+
         // todo: comment it when deploying to production
         await client.db("admin").command({ ping: 1 });
         console.log("Pinged your deployment. You successfully connected to MongoDB!");
