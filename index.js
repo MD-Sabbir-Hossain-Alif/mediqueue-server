@@ -30,6 +30,7 @@ async function run() {
 
         const db = client.db('mediqueue-db')
         const tutorCollection = db.collection("tutors")
+        const bookedTutor = db.collection("booked")
 
         app.get('/tutors', async (req, res) => {
             const result = await tutorCollection.find().toArray()
@@ -60,6 +61,13 @@ async function run() {
             const result = await tutorCollection.deleteOne({ _id: new ObjectId(id) })
             res.json(result)
         });
+
+        //booked api
+        app.post('/booked', async (req, res) => {
+            const booked = await req.body
+            const result = await bookedTutor.insertOne(booked)
+            res.json(result)
+        })
 
         // todo: comment it when deploying to production
         await client.db("admin").command({ ping: 1 });
