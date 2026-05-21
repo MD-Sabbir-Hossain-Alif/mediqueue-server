@@ -69,6 +69,17 @@ async function run() {
             res.json(result)
         })
 
+        app.get('/booked', async (req, res) => {
+            const result = await bookedTutor.find().toArray()
+            res.json(result)
+        });
+
+        app.delete('/booked/:id', async (req, res) => {
+            const id = await req.params.id
+            const result = await bookedTutor.deleteOne({ _id: new ObjectId(id) })
+            res.json(result)
+        });
+
         // todo: comment it when deploying to production
         await client.db("admin").command({ ping: 1 });
         console.log("Pinged your deployment. You successfully connected to MongoDB!");
