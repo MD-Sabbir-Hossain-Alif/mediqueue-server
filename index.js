@@ -48,7 +48,18 @@ async function run() {
             res.json(result)
         });
 
+        app.patch('/tutors/:id', async (req, res) => {
+            const id = await req.params.id
+            const tutor = req.body
+            const result = await tutorCollection.updateOne({ _id: new ObjectId(id) }, { $set: tutor })
+            res.json(result)
+        });
 
+        app.delete('/tutors/:id', async (req, res) => {
+            const id = await req.params.id
+            const result = await tutorCollection.deleteOne({ _id: new ObjectId(id) })
+            res.json(result)
+        });
 
         // todo: comment it when deploying to production
         await client.db("admin").command({ ping: 1 });
