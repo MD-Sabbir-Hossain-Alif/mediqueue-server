@@ -56,7 +56,7 @@ const verifyToken = async (req, res, next) => {
 async function run() {
     try {
         // todo: comment it when deploying to production
-        // await client.connect();
+        await client.connect();
 
         const db = client.db('mediqueue-db')
         const tutorCollection = db.collection("tutors")
@@ -140,8 +140,30 @@ async function run() {
             res.json(result)
         });
 
+        // Search api
+        app.get('/search', async (req, res) => {
+            const { name, startDate, endDate } = req.query;
+
+            const filter = {};
+
+            if (name) {
+                filter.tutorName = {
+                    $regex: name,
+                    $options: "i",
+                };
+            }
+
+            if (startDate && endDate) {
+                filter.sessionStartDate = { $lte: new Date(endDate) };
+                filter.sessionEndDate = { $gte: new Date(startDate) };
+            }
+
+            const tutors = await tutorCollection.find(filter).toArray();
+            res.json(tutors);
+        });
+
         // todo: comment it when deploying to production
-        // await client.db("admin").command({ ping: 1 });
+        await client.db("admin").command({ ping: 1 });
         console.log("Pinged your deployment. You successfully connected to MongoDB!");
     } finally {
 
