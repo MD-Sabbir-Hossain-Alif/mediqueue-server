@@ -56,7 +56,7 @@ const verifyToken = async (req, res, next) => {
 async function run() {
     try {
         // todo: comment it when deploying to production
-        // await client.connect();
+        await client.connect();
 
         const db = client.db('mediqueue-db')
         const tutorCollection = db.collection("tutors")
@@ -104,6 +104,31 @@ async function run() {
             res.json(result)
         })
 
+        app.patch('/booked/:id', verifyToken, async (req, res) => {
+            const id = await req.params.id
+            const result = await tutorCollection.updateOne({ _id: new ObjectId(id) },
+                {
+                    $inc: {
+                        totalSlot: -1,
+                    },
+                })
+            res.json(result)
+        })
+
+        app.patch('/booked/update/:id', verifyToken, async (req, res) => {
+            const id = req.params.id;
+
+            const result = await bookedTutor.updateOne(
+                { _id: new ObjectId(id) },
+                {
+                    $set: {
+                        status: false
+                    }
+                }
+            )
+            res.json(result)
+        });
+
         app.get('/booked', verifyToken, async (req, res) => {
             const result = await bookedTutor.find().toArray()
             res.json(result)
@@ -116,7 +141,7 @@ async function run() {
         });
 
         // todo: comment it when deploying to production
-        // await client.db("admin").command({ ping: 1 });
+        await client.db("admin").command({ ping: 1 });
         console.log("Pinged your deployment. You successfully connected to MongoDB!");
     } finally {
 
