@@ -153,12 +153,15 @@ async function run() {
                 };
             }
 
+            // console.log(startDate, endDate)
+
             if (startDate && endDate) {
-                filter.sessionStartDate = { $lte: new Date(endDate) };
-                filter.sessionEndDate = { $gte: new Date(startDate) };
+                filter.sessionStartDate = { $lte: endDate };
+                filter.sessionEndDate = { $gte: startDate };
             }
 
             const tutors = await tutorCollection.find(filter).toArray();
+            // console.log(tutors)
             res.json(tutors);
         });
 
